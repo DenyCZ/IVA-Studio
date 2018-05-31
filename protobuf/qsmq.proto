@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+message BBox {
+    int32 x = 1;
+    int32 y = 2;
+    int32 w = 3;
+    int32 h = 4;
+}
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+message Polygon {
+    repeated Point p = 1;
+    bool closed = 2;
+}
+message SegmObject {
+    repeated Polygon polys = 1;
+}
+message ObjectAnnotation {
+    int32 class_id = 1;
+    float score = 2;    // 0.0 - not al all, 1.0 - 100%
+    BBox bbox = 3;
+    SegmObject segm = 4;
+    Point florplanpoint = 5;
+    string features = 6;    // dict of features in JSON as a string
+}
+message ImageView {
+    int32 conversionType = 1;
+    repeated float conversionParams = 2;
+    repeated ObjectAnnotation objectAnnotations = 3;
+    string imgKey = 4;
+}
+message CameraImage {
+    string videoStreamName = 1;
+    double timestamp = 2;
+    repeated ImageView views = 3;
+}
