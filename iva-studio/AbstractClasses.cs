@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace iva_studio
+namespace ITIM.IVAStudio.Manager
 {
     abstract public class ProtobufTranscoder
     {
@@ -13,7 +13,7 @@ namespace iva_studio
 
     abstract public class SharedStorage
     {
-        public byte[] Get(String key);
+        //public byte[] Get(String key);
         
         public void Set(String key, byte[] data)
         {

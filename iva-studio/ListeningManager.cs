@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 
-namespace iva_studio
+namespace ITIM.IVAStudio.Manager
 {
     class ListeningManager
     {
