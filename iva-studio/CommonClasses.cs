@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITIM.IVAStudio.Manager
+namespace iva_studio
 {
-    public class AnnotatedCamera
+    class AnnotatedCamera
     {
         // TODO
     }
-    public class AnnotatedCameraRoutingKey
+    class AnnotatedCameraRoutingKey
     {
-        public AnnotatedCamera camera;
-        public List<String> routing_key;
+        AnnotatedCamera camera;
+        List<String> routing_key;
         public AnnotatedCameraRoutingKey(AnnotatedCamera camera, String routing_key)
         {
             this.camera = camera;
-            this.routing_key = new List<String>(routing_key.Split('.'));
+            this.routing_key = List<String>();
         }
         
         

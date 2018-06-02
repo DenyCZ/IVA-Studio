@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ITIM.IVAStudio
+namespace iva_studio
 {
     /// <summary>
     /// Interaction logic for App.xaml
