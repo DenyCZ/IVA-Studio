@@ -1,15 +1,18 @@
-import numpy as np
-import cv2
-import time
 import json
-from Core.geometric_classes import Point, BoundingBox, ObjectSegmentation
+import time
+
+import numpy as np
+
 import Core.protobuf.qsmq_pb2 as pb
-from Core.messages_transcode import encodeimage, decodeimage
 from Core.abstract_classes import ProtobufTranscoder
+from Core.geometric_classes import Point, BoundingBox, ObjectSegmentation
+from Core.messages_transcode import encodeimage, decodeimage
+
 
 class ObjectAnnotation(ProtobufTranscoder):
     pbekvivalent = pb.ObjectAnnotation
-    def __init__(self, class_id=0, score=0.0, bbox=None, segmentation=None, features={}, floorplanPoint=None):
+
+    def __init__(self, class_id=0, score=0.0, bbox=None, segmentation=None, features={}, floorplanPoint=None, **kwargs):
         assert isinstance(class_id, int)
         assert isinstance(score, (float, int))
         assert bbox is None or isinstance(bbox, BoundingBox)
@@ -22,6 +25,7 @@ class ObjectAnnotation(ProtobufTranscoder):
         self.segmentation = segmentation
         self.features = features
         self.floorplanPoint = floorplanPoint
+
     def getProtobufEquivalent(self, dest=None, sharedStorage=None):
         if dest is None:
             dest = self.pbekvivalent()
@@ -35,12 +39,14 @@ class ObjectAnnotation(ProtobufTranscoder):
             self.floorplanPoint.getProtobufEquivalent(dest=dest.florplanpoint)
         dest.features = json.dumps(self.features)
         return dest
+
     @classmethod
     def fromProtobufEquivalent(cls, pbmessage, sharedStorage=None):
         bbox = BoundingBox.fromProtobufEquivalent(pbmessage.bbox) if pbmessage.HasField("bbox") else None
         segmentation = ObjectSegmentation.fromProtobufEquivalent(pbmessage.segm) if pbmessage.HasField("segm") else None
         features = json.loads(pbmessage.features)
-        floorplanPoint = Point.fromProtobufEquivalent(pbmessage.florplanpoint) if pbmessage.HasField("florplanpoint") else None
+        floorplanPoint = Point.fromProtobufEquivalent(pbmessage.florplanpoint) if pbmessage.HasField(
+            "florplanpoint") else None
         ret = cls(class_id=pbmessage.class_id,
                   score=pbmessage.score,
                   bbox=bbox,
@@ -49,8 +55,10 @@ class ObjectAnnotation(ProtobufTranscoder):
                   floorplanPoint=floorplanPoint)
         return ret
 
+
 class AnnotatedImageView(ProtobufTranscoder):
     pbekvivalent = pb.ImageView
+
     def __init__(self, convType, convParams, image, objannotations=[]):
         #assert isinstance(convType, )
         assert isinstance(convParams, tuple)
@@ -63,6 +71,7 @@ class AnnotatedImageView(ProtobufTranscoder):
         self.image = image
         self.imgKey = None
         self.objannotations = objannotations
+
     def getProtobufEquivalent(self, dest=None, sharedStorage=None):
         assert hasattr(sharedStorage, 'uniqueKey')
         assert hasattr(sharedStorage, 'set')
@@ -80,6 +89,7 @@ class AnnotatedImageView(ProtobufTranscoder):
             pbobjs = [objann.getProtobufEquivalent(sharedStorage=sharedStorage) for objann in self.objannotations]
             dest.objectAnnotations.extend(pbobjs)
         return dest
+
     @classmethod
     def fromProtobufEquivalent(cls, pbmessage, sharedStorage=None):
         assert hasattr(sharedStorage, 'get')
@@ -94,8 +104,10 @@ class AnnotatedImageView(ProtobufTranscoder):
         ret.imgKey = imgkey
         return ret
 
+
 class AnnotatedCamera(ProtobufTranscoder):
     pbekvivalent = pb.CameraImage
+
     def __init__(self, videoStreamName, imageViews=[], timestamp=None):
         assert isinstance(videoStreamName, str)
         assert isinstance(imageViews, list)
@@ -105,6 +117,7 @@ class AnnotatedCamera(ProtobufTranscoder):
         self.videoStreamName = videoStreamName
         self.imageViews = imageViews
         self.timestamp = timestamp
+
     def getProtobufEquivalent(self, dest=None, sharedStorage=None):
         if dest is None:
             dest = self.pbekvivalent()
@@ -115,11 +128,8 @@ class AnnotatedCamera(ProtobufTranscoder):
 
     @classmethod
     def fromProtobufEquivalent(cls, pbmessage, sharedStorage=None):
-        views = [AnnotatedImageView.fromProtobufEquivalent(view, sharedStorage=sharedStorage) for view in pbmessage.views]
+        views = [AnnotatedImageView.fromProtobufEquivalent(view, sharedStorage=sharedStorage) for view in
+                 pbmessage.views]
         return cls(videoStreamName=pbmessage.videoStreamName,
-            imageViews=views,
-            timestamp=pbmessage.timestamp)
-
-
-
-
+                   imageViews=views,
+                   timestamp=pbmessage.timestamp)
